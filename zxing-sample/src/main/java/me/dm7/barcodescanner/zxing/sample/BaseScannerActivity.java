@@ -16,6 +16,12 @@ public class BaseScannerActivity extends AppCompatActivity {
     }
 
     @Override
+    synchronized protected void onPause() {
+        super.onPause();
+        System.out.println("========== onPause ==========");
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button

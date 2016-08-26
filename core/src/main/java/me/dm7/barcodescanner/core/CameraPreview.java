@@ -80,10 +80,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 getHolder().addCallback(this);
                 mPreviewing = true;
                 setupCameraParameters();
-                mCameraWrapper.mCamera.setPreviewDisplay(getHolder());
-                mCameraWrapper.mCamera.setDisplayOrientation(getDisplayOrientation());
-                mCameraWrapper.mCamera.setOneShotPreviewCallback(mPreviewCallback);
-                mCameraWrapper.mCamera.startPreview();
+                mCameraWrapper.getCamera().setPreviewDisplay(getHolder());
+                mCameraWrapper.getCamera().setDisplayOrientation(getDisplayOrientation());
+                mCameraWrapper.getCamera().setOneShotPreviewCallback(mPreviewCallback);
+                mCameraWrapper.getCamera().startPreview();
                 if(mAutoFocus) {
                     if (mSurfaceCreated) { // check if surface created before using autofocus
                         safeAutoFocus();
@@ -99,23 +99,30 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void safeAutoFocus() {
         try {
-            mCameraWrapper.mCamera.autoFocus(autoFocusCB);
+            if (mCameraWrapper != null) {
+                System.out.println("========== safeAutoFocus ==========");
+                mCameraWrapper.getCamera().autoFocus(autoFocusCB);
+            }
         } catch (RuntimeException re) {
             // Horrible hack to deal with autofocus errors on Sony devices
             // See https://github.com/dm77/barcodescanner/issues/7 for example
+            System.out.println("========== safeAutoFocus Catch ==========");
+            re.printStackTrace();
             scheduleAutoFocus(); // wait 1 sec and then do check again
         }
     }
 
     public void stopCameraPreview() {
         if(mCameraWrapper != null) {
+            System.out.println("========== Stoping camera preview ==========");
             try {
                 mPreviewing = false;
                 getHolder().removeCallback(this);
-                mCameraWrapper.mCamera.cancelAutoFocus();
-                mCameraWrapper.mCamera.setOneShotPreviewCallback(null);
-                mCameraWrapper.mCamera.stopPreview();
+                mCameraWrapper.stopPreView();
+                mAutoFocusHandler.removeCallbacks(doAutoFocus);
             } catch(Exception e) {
+                System.out.println("========== Exception while stoping camera preview ==========");
+                e.printStackTrace();
                 Log.e(TAG, e.toString(), e);
             }
         }
@@ -123,9 +130,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void setupCameraParameters() {
         Camera.Size optimalSize = getOptimalPreviewSize();
-        Camera.Parameters parameters = mCameraWrapper.mCamera.getParameters();
+        Camera.Parameters parameters = mCameraWrapper.getCamera().getParameters();
         parameters.setPreviewSize(optimalSize.width, optimalSize.height);
-        mCameraWrapper.mCamera.setParameters(parameters);
+        mCameraWrapper.getCamera().setParameters(parameters);
         adjustViewSize(optimalSize);
     }
 
@@ -226,7 +233,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             return null;
         }
 
-        List<Camera.Size> sizes = mCameraWrapper.mCamera.getParameters().getSupportedPreviewSizes();
+        List<Camera.Size> sizes = mCameraWrapper.getCamera().getParameters().getSupportedPreviewSizes();
         int w = getWidth();
         int h = getHeight();
         if (DisplayUtils.getScreenOrientation(getContext()) == Configuration.ORIENTATION_PORTRAIT) {
@@ -282,7 +289,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 }
             } else {
                 Log.v(TAG, "Cancelling autofocus");
-                mCameraWrapper.mCamera.cancelAutoFocus();
+                mCameraWrapper.getCamera().cancelAutoFocus();
             }
         }
     }
