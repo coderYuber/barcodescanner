@@ -16,7 +16,6 @@ public class CameraWrapper {
     }
 
     public synchronized void releaseCamera() {
-        System.out.println("========== releaseCamera ==========");
         mCamera.setPreviewCallback(null);
         mCamera.release();
         mCamera = null;

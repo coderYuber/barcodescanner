@@ -100,29 +100,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void safeAutoFocus() {
         try {
             if (mCameraWrapper != null) {
-                System.out.println("========== safeAutoFocus ==========");
                 mCameraWrapper.getCamera().autoFocus(autoFocusCB);
             }
         } catch (RuntimeException re) {
             // Horrible hack to deal with autofocus errors on Sony devices
             // See https://github.com/dm77/barcodescanner/issues/7 for example
-            System.out.println("========== safeAutoFocus Catch ==========");
-            re.printStackTrace();
             scheduleAutoFocus(); // wait 1 sec and then do check again
         }
     }
 
     public void stopCameraPreview() {
         if(mCameraWrapper != null) {
-            System.out.println("========== Stoping camera preview ==========");
             try {
                 mPreviewing = false;
                 getHolder().removeCallback(this);
                 mCameraWrapper.stopPreView();
                 mAutoFocusHandler.removeCallbacks(doAutoFocus);
             } catch(Exception e) {
-                System.out.println("========== Exception while stoping camera preview ==========");
-                e.printStackTrace();
                 Log.e(TAG, e.toString(), e);
             }
         }

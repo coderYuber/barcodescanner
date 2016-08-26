@@ -99,8 +99,6 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
     }
 
     public synchronized void stopCamera() {
-        System.out.println("========== stopCamera ==========");
-
         if(mCameraHandlerThread != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 mCameraHandlerThread.quitSafely();
@@ -111,7 +109,6 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
         }
 
         if(mCameraWrapper != null) {
-            System.out.println("========== Try to stop camera ==========");
             mPreview.stopCameraPreview();
             mCameraWrapper.releaseCamera();
             mCameraWrapper = null;

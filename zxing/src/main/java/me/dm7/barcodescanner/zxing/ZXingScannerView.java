@@ -90,7 +90,6 @@ public class ZXingScannerView extends BarcodeScannerView {
 
     @Override
     public synchronized void onPreviewFrame(byte[] data, Camera camera) {
-        System.out.println("========== Start onPreviewFrame ==========");
 
         if(mResultHandler == null) {
             return;
@@ -152,15 +151,12 @@ public class ZXingScannerView extends BarcodeScannerView {
                     }
                 });
             } else {
-                    System.out.println("========== onPreviewFrame : no rawResult -> camera.setOneShotPreviewCallback ==========");
                     camera.setOneShotPreviewCallback(this);
             }
         } catch(RuntimeException e) {
             // TODO: Terrible hack. It is possible that this method is invoked after camera is released.
             Log.e(TAG, e.toString(), e);
         }
-
-        System.out.println("========== End onPreviewFrame ==========");
     }
 
     public void resumeCameraPreview(ResultHandler resultHandler) {
